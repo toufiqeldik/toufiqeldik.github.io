@@ -88,6 +88,11 @@ stay on `main` and are never served.
 Only `main` is the source of truth for the code; `gh-pages` is generated, so edit `public/`
 and re-run the command rather than committing to `gh-pages` by hand.
 
+Pages runs Jekyll on that branch. None of the files carry YAML front matter, so they are
+copied through byte-for-byte — verified by comparing checksums of `public/` against what the
+live site serves. If you ever add a file whose name starts with `_`, add an empty `.nojekyll`
+file to the published output (not to `public/`, which is uploaded to Freebuff too).
+
 **Optional: deploy on push instead.** The gh CLI token here has no `workflow` scope, so an
 Actions workflow cannot be pushed from this machine. Run `gh auth refresh -s workflow` once
 and the following becomes possible — plus the same `npm run check` gate, run by GitHub:
