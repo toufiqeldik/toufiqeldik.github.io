@@ -694,6 +694,13 @@ h1#hero-title em {
   .frame__inset { display: none; }
 }
 
+/* The footer links fit on one line once the separators stop taking up room,
+   and no separator is ever left dangling at the end of a line. */
+@media (max-width: 560px) {
+  .site-foot__links { gap: 10px 18px; }
+  .site-foot__links span { display: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .js [data-reveal] { opacity: 1; transform: none; }
