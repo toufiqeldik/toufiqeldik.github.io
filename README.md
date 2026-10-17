@@ -72,21 +72,49 @@ The published URL appears in these places, so update them together:
 
 ### GitHub Pages (the live site)
 
-Any push to `main` publishes automatically via
-[.github/workflows/deploy-pages.yml](.github/workflows/deploy-pages.yml), which runs
-`npm run check` first and fails the deploy if a link, alt text or image dimension is wrong.
-Only `public/` is uploaded, so the tooling and design sources stay in the repository without
-being served. To publish by hand:
-
 ```bash
-npm run check
-gh workflow run deploy-pages.yml --repo toufiqeldik/toufiqeldik.github.io
-gh run watch --repo toufiqeldik/toufiqeldik.github.io
+git add . && git commit -m "…"   # commit the change
+npm run deploy:pages              # runs the checks, then pushes public/ to gh-pages
 ```
 
-This repo is a *user site* (`toufiqeldik.github.io`), so the site sits at the domain root.
-Because Pages is built from an uploaded artifact rather than a Jekyll build, no `.nojekyll`
-file is needed — but add one if you ever switch Pages back to "deploy from a branch".
+[scripts/deploy-pages.mjs](scripts/deploy-pages.mjs) copies `public/` onto the `gh-pages`
+branch with `git subtree push`, and Pages serves that branch at the domain root. It refuses
+to publish a dirty working tree, and runs `npm run check` first so a broken link, missing alt
+text or wrong image dimension stops the deploy.
+
+Only the contents of `public/` ever reach `gh-pages` — the tooling, design sources and worker
+stay on `main` and are never served.
+
+Only `main` is the source of truth for the code; `gh-pages` is generated, so edit `public/`
+and re-run the command rather than committing to `gh-pages` by hand.
+
+**Optional: deploy on push instead.** The gh CLI token here has no `workflow` scope, so an
+Actions workflow cannot be pushed from this machine. Run `gh auth refresh -s workflow` once
+and the following becomes possible — plus the same `npm run check` gate, run by GitHub:
+
+```yaml
+name: Deploy portfolio to GitHub Pages
+on:
+  push: { branches: [main] }
+  workflow_dispatch:
+permissions: { contents: read, pages: write, id-token: write }
+concurrency: { group: pages, cancel-in-progress: true }
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: { name: github-pages, url: "${{ steps.deployment.outputs.page_url }}" }
+    steps:
+      - uses: actions/checkout@v4
+      - run: node scripts/check-site.mjs
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: ./public }
+      - id: deployment
+        uses: actions/deploy-pages@v4
+```
+
+Save it as `.github/workflows/deploy-pages.yml` and switch the Pages source to
+"GitHub Actions" in the repository settings; you can then drop `npm run deploy:pages`.
 
 ### Freebuff Sites (mirror)
 
