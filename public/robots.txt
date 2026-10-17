@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://toufiqeldik.github.io/sitemap.xml
