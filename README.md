@@ -66,7 +66,8 @@ The published URL appears in these places, so update them together:
 1. `public/index.html` — `<link rel="canonical">`, `og:url`, `og:image`
 2. `public/robots.txt` — the `Sitemap:` line
 3. `public/sitemap.xml` — the `<loc>` value
-4. `public/index.html` — the contact and footer links if the email changes too
+4. `public/index.html` — the contact buttons, the About facts list and the footer links,
+   wherever your email, LinkedIn or GitHub details appear
 
 ## Deploying
 
